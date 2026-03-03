@@ -62,9 +62,16 @@ OPENWEATHERMAP_API_KEY=your_key_here
    for f in d1_chunks/insert_*.sql; do npx wrangler d1 execute mcp-weather-db --remote --file="$f"; done
    ```
 
+## Python Worker API（天氣後端）
+
+提供給 TS MCP Agent 呼叫的內部 API（需先完成 D1 匯入與設定 `OPENWEATHERMAP_API_KEY`）：
+
+- `GET /api/coordinates?city=<名稱>` — 查詢城市經緯度，回傳 `{ "cities": [ { "id", "name", "country", "lon", "lat" }, ... ] }`；找不到則 404。
+- `GET /api/weather?lat=<緯度>&lon=<經度>` — 呼叫 OpenWeatherMap，回傳即時天氣（含錯誤處理：逾時、429 用量限制、401/502）。
+
 ## 本機執行
 
-- **Python Worker（天氣 API）**：`uv run pywrangler dev` 或依 [Cloudflare Python Workers 文件](https://developers.cloudflare.com/workers/languages/python/) 執行。
+- **Python Worker（天氣 API）**：`uv run pywrangler dev` 或 `npx wrangler dev`（需先 `npx wrangler d1 create mcp-weather-db` 並將 `database_id` 填入 `wrangler.toml`）。
 - **TS MCP 伺服器**：見 `workers/ts-agent/` 內說明（階段 3、4 實作後補上）。
 
 ## 呼叫流程範例（MCP Inspector）
