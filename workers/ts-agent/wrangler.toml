@@ -6,3 +6,17 @@ compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 
 # 呼叫 Python Worker 的 URL（本機或部署後網址），以 secret 或 vars 設定
 # 例如: PYTHON_WORKER_URL = "https://mcp-weather-api.xxx.workers.dev"
+
+# Cloudflare Access for SaaS 相關設定
+# 以下為 Secrets，請透過 `wrangler secret put` 設定：
+# ACCESS_CLIENT_ID
+# ACCESS_CLIENT_SECRET
+# ACCESS_TOKEN_URL
+# ACCESS_AUTHORIZATION_URL
+# ACCESS_JWKS_URL
+# COOKIE_ENCRYPTION_KEY
+
+# 用於儲存 OAuth Token 的 KV 空間
+# [[kv_namespaces]]
+# binding = "OAUTH_KV"
+# id = "<YOUR_KV_NAMESPACE_ID>"
