@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "weather-outfit-mcp": {
+      "url": "https://mcp-ts-agent.weihe.workers.dev/mcp"
+    }
+  }
+}
