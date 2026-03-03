@@ -12,3 +12,8 @@ dist/
 .env
 # Cloudflare 本地環境變數
 .dev.vars
+
+# D1 匯入產生的分塊 SQL（由 scripts/import_cities_to_d1.py 產生）
+d1_chunks/
+# 大型手動產生的 INSERT 檔（請用腳本產生 d1_chunks/ 後用 wrangler 匯入）
+insert.sql

@@ -1,0 +1,11 @@
+# MCP 天氣 API (Python Worker) — 階段 2 會補上 D1 查詢與天氣 API
+name = "mcp-weather-api"
+main = "workers/python/index.py"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["python_workers"]
+
+# D1：城市經緯度資料庫（需先執行 wrangler d1 create mcp-weather-db 取得 database_id 後填入）
+[[d1_databases]]
+binding = "DB"
+database_name = "mcp-weather-db"
+database_id = "REPLACE_AFTER_D1_CREATE"
