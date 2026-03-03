@@ -5,6 +5,7 @@ __pycache__/
 
 # Node.js
 node_modules/
+workers/ts-agent/node_modules/
 dist/
 .wrangler/
 

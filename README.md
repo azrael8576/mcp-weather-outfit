@@ -71,8 +71,8 @@ OPENWEATHERMAP_API_KEY=your_key_here
 
 ## 本機執行
 
-- **Python Worker（天氣 API）**：`uv run pywrangler dev` 或 `npx wrangler dev`（需先 `npx wrangler d1 create mcp-weather-db` 並將 `database_id` 填入 `wrangler.toml`）。
-- **TS MCP 伺服器**：見 `workers/ts-agent/` 內說明（階段 3、4 實作後補上）。
+- **Python Worker（天氣 API）**：在專案根目錄執行 `uv run pywrangler dev` 或 `npx wrangler dev`（需先建立 D1 並將 `database_id` 填入根目錄 `wrangler.toml`）。
+- **TS MCP 伺服器**：`cd workers/ts-agent && npm install && npm run dev`，MCP 端點為 `http://localhost:8787/mcp`（埠號以終端機輸出為準）。使用 MCP Inspector 時輸入此 URL 即可連線。
 
 ## 呼叫流程範例（MCP Inspector）
 
