@@ -1,0 +1,37 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mcp-ts-agent",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-12-01",
+  "migrations": [
+    {
+      "new_sqlite_classes": ["WeatherOutfitMCP"],
+      "tag": "v1"
+    }
+  ],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "WeatherOutfitMCP",
+        "name": "MCP_OBJECT"
+      }
+    ]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "87a2bfa628484a4dbd043114fcd0d8d3"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "dev": {
+    "port": 8788
+  }
+}
