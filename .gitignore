@@ -1,0 +1,14 @@
+# Python
+.venv/
+__pycache__/
+.uv/
+
+# Node.js
+node_modules/
+dist/
+.wrangler/
+
+# Secrets
+.env
+# Cloudflare 本地環境變數
+.dev.vars
