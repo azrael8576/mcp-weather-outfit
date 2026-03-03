@@ -1,8 +1,0 @@
-# MCP 伺服器 (TypeScript) — 對外提供 /mcp，內部呼叫 Python Worker
-name = "mcp-ts-agent"
-main = "src/index.ts"
-compatibility_date = "2024-12-01"
-compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
-
-# 呼叫 Python Worker 的 URL（本機或部署後網址），以 secret 或 vars 設定
-# 例如: PYTHON_WORKER_URL = "https://mcp-weather-api.xxx.workers.dev"
