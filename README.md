@@ -19,6 +19,7 @@
 
 ```bash
 # 依賴（專案根目錄）
+npm install
 uv sync
 ```
 
@@ -76,11 +77,11 @@ OPENWEATHERMAP_API_KEY=your_key_here
 
 ## 呼叫流程範例（MCP Inspector）
 
-1. 執行 `npx @modelcontextprotocol/inspector@latest`
-2. 輸入 MCP 伺服器位址（本機例如 `http://127.0.0.1:8080/sse`，依實際埠與路徑調整）
-3. 在 Inspector 中可：
-   - 使用 **Tools**：`search_city_coordinates`、`get_weather`
-   - 讀取 **Resource**：`outfit_guidelines`
-   - 使用 **Prompt**：`weather_outfit_advisor`
-
-（上述端點與埠號將在 TS Agent 實作完成後於 README 與 writeup 中補齊。）
+1. 啟動 **Python Worker**（天氣 API）：在專案根目錄執行 `npx wrangler dev`（或 `uv run pywrangler dev`），記下埠號（例如 8788）。
+2. 設定 **TS MCP 伺服器** 的環境變數：在 `workers/ts-agent` 建立 `.dev.vars`，加入 `PYTHON_WORKER_URL=http://localhost:8788`（埠號與上一步一致）。
+3. 啟動 **TS MCP**：`cd workers/ts-agent && npm run dev`，記下埠號（例如 8787）。
+4. 執行 `npx @modelcontextprotocol/inspector@latest`，在 Inspector 中輸入 MCP 位址：`http://localhost:8787/mcp`（以實際埠號為準）。
+5. 連線後可：
+   - **Tools**：點選並呼叫 `search_city_coordinates`（輸入城市名）、`get_weather`（輸入 lat, lon）。
+   - **Resources**：讀取 `outfit_guidelines`（URI: res://outfit_guidelines）取得穿搭指南文字。
+   - **Prompts**：使用 `weather_outfit_advisor`，會帶入指示「先查座標 → 查天氣 → 讀取指南 → 產出穿搭建議」。
