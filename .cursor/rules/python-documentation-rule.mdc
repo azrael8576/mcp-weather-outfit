@@ -1,0 +1,14 @@
+---
+description: Python 文件規範（README + docstring）
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Python Documentation Rule
+
+- 公開函式必須有 docstring，說明用途、參數、回傳值與例外。
+- README 至少維持：啟動方式、環境變數、測試方式、部署摘要。
+- 複雜邏輯前加 1~2 行註解說明「為什麼」，避免逐行翻譯式註解。
+- 對外 API（如 tool 函式）需提供最小可執行範例。
+- 修改行為時同步更新文件，避免文件與實作不一致。
+- 教學導向：文案偏直白，避免過度術語，適合新手接手。

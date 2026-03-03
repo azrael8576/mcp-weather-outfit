@@ -1,0 +1,14 @@
+---
+description: Python 依賴管理（uv + lockfile）
+globs: "**/pyproject.toml"
+alwaysApply: false
+---
+
+# Python Dependency Management
+
+- 使用 `uv add <package>` 新增依賴，不手改版本清單。
+- 提交程式碼時同步提交 `pyproject.toml` 與 `uv.lock`。
+- 優先固定主要版本範圍（例如 `>=1.0.0,<2.0.0`）避免破壞性更新。
+- 若僅開發工具，放在 dev dependency，不混入 runtime。
+- 新增依賴需附一句理由（用途、替代方案為何不選）。
+- 不使用的套件要移除，避免冷啟動與安全風險。

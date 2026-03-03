@@ -1,0 +1,14 @@
+---
+description: Python 設定與機密資訊管理（ENV-first）
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Python Configuration Management
+
+- 所有機密值（API key、token）必須來自環境變數，不可硬編碼。
+- 讀取設定時使用明確名稱，例如 `OPENWEATHER_API_KEY`。
+- 啟動時先驗證必要環境變數，缺少就丟出清楚錯誤訊息。
+- `.env` 僅限本機使用，`.env.example` 只放欄位名與範例值。
+- Cloudflare 機密使用 `wrangler secret put`，不放在 `wrangler.jsonc`。
+- 錯誤訊息禁止輸出完整機密值，只能顯示遮罩資訊。

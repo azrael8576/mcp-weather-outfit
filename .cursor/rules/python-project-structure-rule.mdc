@@ -1,0 +1,14 @@
+---
+description: Python 專案結構精簡規範（新手友善）
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Python Project Structure (Lean)
+
+- 腳本入口固定使用 `def main()` 與 `if __name__ == "__main__": main()`。
+- 一個檔案只放同一主題的邏輯；超過 150 行時優先拆模組。
+- 一個函式做一件事；超過 20 行先考慮拆出 helper function。
+- 依此順序排版：`import` → 常數 → 類別/函式 → `main()`。
+- 命名要可讀：避免 `x`, `tmp`, `data` 這類模糊名稱。
+- 若新增資料夾，優先遵守：`src/`, `tests/`, `docs/` 的分層。

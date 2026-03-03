@@ -7,4 +7,5 @@ requires-python = ">=3.13"
 dependencies = [
     "mcp>=1.26.0",
     "requests>=2.32.5",
+    "python-dotenv>=1.0.0",
 ]

@@ -1,0 +1,38 @@
+---
+description: 單元測試規範：依 3A（Arrange Act Assert）撰寫，並在區塊中加上對應註解
+globs: tests/**/*.py
+alwaysApply: false
+---
+
+# 單元測試 3A 規範
+
+撰寫單元測試時請依 **3A** 結構：**Arrange**（準備）→ **Act**（執行）→ **Assert**（斷言）。  
+在每個區塊前插入對應註解，並以空行分隔區塊，方便閱讀與維護。
+
+## 範例
+
+```python
+def test_example():
+    """測試說明。"""
+
+    # Arrange
+    text = """
+    Meeting notes:
+    We need to submit the weekly report by Friday.
+    """
+    text = text.strip()
+
+    # Act
+    items = extract_action_items_by_LLM(text)
+
+    # Assert
+    assert isinstance(items, list)
+    assert len(items) >= 1
+    assert "report" in " ".join(items).lower()
+```
+
+## 要點
+
+- **Arrange**：準備輸入、依賴與測試資料（如 `text`、mock）。
+- **Act**：呼叫被測函式一次，取得結果（如 `items = extract_action_items_by_LLM(text)`）。
+- **Assert**：驗證型別、數量、內容或關鍵字，必要時用空行分組多個 assert。

@@ -1,0 +1,14 @@
+---
+description: Python 程式風格一致性（Ruff/Black 友善）
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Python Code Style Consistency
+
+- 遵守 PEP 8，預設以 Black 風格（88 字元行寬）撰寫。
+- 匯入順序固定：標準庫 → 第三方套件 → 本地模組，區塊間留空行。
+- 使用型別標註（type hints）於公開函式參數與回傳值。
+- 優先用早回傳（early return）降低巢狀 if/else。
+- 不保留被註解掉的舊程式碼，避免降低可讀性。
+- 變數名稱語意化：`weather_data` 優於 `data`。

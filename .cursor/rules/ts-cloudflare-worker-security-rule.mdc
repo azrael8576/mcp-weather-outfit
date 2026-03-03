@@ -1,0 +1,14 @@
+---
+description: Cloudflare Worker JWT 驗證與安全規範（Hybrid MCP）
+globs: "mcp-server-cf/**/*.ts"
+alwaysApply: false
+---
+
+# TypeScript Cloudflare Worker Security
+
+- 對進入 Worker 的請求先驗證 `Cf-Access-Jwt-Assertion`，失敗直接回 401。
+- JWT 驗證後再做授權：只允許指定 email（如 `jane@chaocode.co`）。
+- 機密值必須走 `wrangler secret`，禁止硬編碼在 `.ts` 或 `wrangler.jsonc`。
+- 錯誤回應採固定格式（status + message + request id），避免洩漏內部細節。
+- 以 `Request`/`Response` 純函式邏輯撰寫 handler，便於單元測試。
+- 對外回應最小化，內部記錄可追蹤（含 path、method、trace id）。

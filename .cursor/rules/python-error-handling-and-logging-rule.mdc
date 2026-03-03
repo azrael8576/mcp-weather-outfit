@@ -1,0 +1,14 @@
+---
+description: Python 錯誤處理與日誌規範
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Python Error Handling and Logging
+
+- 外部呼叫（HTTP、LLM、檔案 I/O）必須加上例外處理。
+- 不可 `except Exception: pass`；至少記錄錯誤並回傳可理解訊息。
+- 日誌需包含情境：功能名、輸入摘要、錯誤類型，不含機密值。
+- 可恢復錯誤（例如暫時性網路問題）可重試，最多 2~3 次。
+- 不可恢復錯誤要快速失敗（fail fast），避免後續連鎖錯誤。
+- 對使用者回傳友善訊息，詳細堆疊只留在開發日誌。
