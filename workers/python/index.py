@@ -10,7 +10,7 @@ HTTP_TIMEOUT_MS = 10_000
 
 
 class Default(WorkerEntrypoint):
-    async def fetch(self, request):
+    async def on_fetch(self, request):
         url = request.url
         parsed = urlparse(url)
         path = parsed.path.rstrip("/") or "/"
@@ -34,10 +34,21 @@ class Default(WorkerEntrypoint):
                 status=400,
             )
         city = str(city).strip()
+        country_raw = (query.get("country") or [None])[0]
+        country = str(country_raw).strip().upper() if country_raw else None
+        if country and len(country) != 2:
+            country = None  # 僅接受兩碼 ISO 國家代碼
+
         try:
-            stmt = self.env.DB.prepare(
-                "SELECT id, name, country, lon, lat FROM cities WHERE name LIKE ?1 LIMIT 20"
-            ).bind(f"%{city}%")
+            if country:
+                # 有國家代碼時：精確匹配該國家的該城市，只回傳一筆
+                stmt = self.env.DB.prepare(
+                    "SELECT id, name, country, lon, lat FROM cities WHERE name LIKE ?1 AND country = ?2 LIMIT 1"
+                ).bind(f"%{city}%", country)
+            else:
+                stmt = self.env.DB.prepare(
+                    "SELECT id, name, country, lon, lat FROM cities WHERE name LIKE ?1 LIMIT 20"
+                ).bind(f"%{city}%")
             result = await stmt.run()
         except Exception as e:
             return Response.json(
@@ -47,10 +58,26 @@ class Default(WorkerEntrypoint):
         rows = getattr(result, "results", []) or []
         if not rows:
             return Response.json(
-                {"error": "No city found", "query": city},
+                {"error": "No city found", "query": city, "country": country},
                 status=404,
             )
-        return Response.json({"cities": rows})
+        # D1 回傳的 row 可能是 JsProxy，需轉成純 Python 才能 JSON 序列化
+        def row_to_dict(r):
+            if hasattr(r, "to_py"):
+                return r.to_py()
+            return {k: getattr(r, k, r[k] if hasattr(r, "__getitem__") else None) for k in ("id", "name", "country", "lon", "lat")}
+
+        cities = []
+        for r in rows:
+            d = row_to_dict(r)
+            cities.append({
+                "id": int(d.get("id", 0)),
+                "name": str(d.get("name") or ""),
+                "country": str(d.get("country") or ""),
+                "lon": float(d.get("lon", 0)),
+                "lat": float(d.get("lat", 0)),
+            })
+        return Response.json({"cities": cities})
 
     async def _handle_weather(self, query):
         lat = (query.get("lat") or [None])[0]
@@ -68,7 +95,7 @@ class Default(WorkerEntrypoint):
                 {"error": "Invalid lat or lon: must be numbers"},
                 status=400,
             )
-        api_key = getattr(self.env, "OPENWEATHERMAP_API_KEY", None) or getattr(
+        api_key = getattr(self.env, "OPEN_WEATHER_KEY", None) or getattr(
             self.env, "OPEN_WEATHER_KEY", None
         )
         if not api_key:

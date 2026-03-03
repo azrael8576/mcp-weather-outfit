@@ -4,8 +4,8 @@ main = "workers/python/index.py"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["python_workers"]
 
-# D1：城市經緯度資料庫（需先執行 wrangler d1 create mcp-weather-db 取得 database_id 後填入）
+# D1：城市經緯度資料庫（本機 dev 用本地 D1，需先執行「本地 D1 匯入」步驟）
 [[d1_databases]]
 binding = "DB"
 database_name = "mcp-weather-db"
-database_id = "REPLACE_AFTER_D1_CREATE"
+database_id = "2f625606-5c5f-4fce-80d1-8564592b05e8"
