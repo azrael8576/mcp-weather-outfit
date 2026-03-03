@@ -232,13 +232,28 @@ MCP 端點為：`https://mcp-ts-agent.<你的帳號>.workers.dev/mcp`。
 
 ---
 
-### 選用：以 Cloudflare Access for SaaS 保護 MCP
+### 已啟用：以 Cloudflare Access for SaaS 保護 MCP
 
-若希望連線 MCP 時必須先通過 Cloudflare Access（SSO/OIDC 登入），可參考官方教學：[Secure MCP servers with Access for SaaS](https://developers.cloudflare.com/workers-ai/mcp/secure-mcp-servers-with-access-for-saas/)。重點步驟摘要：
+本專案的 TS MCP Worker 已實作 Cloudflare Access (SSO/OIDC) 保護，確保只有經過驗證的使用者才能存取 MCP 端點。
 
-1. **建立 Zero Trust 組織**，並設定 One-time PIN 或第三方 IdP。
-2. **建立 Access for SaaS 應用**：在 Zero Trust → Access → Applications 新增 SaaS 應用，類型 OIDC，redirect URI 設為 `https://mcp-ts-agent.<你的子網域>.workers.dev/callback`，取得 `client_id`、`client_secret` 及 Token / Authorization / JWKS 端點 URL。
-3. **在 TS MCP Worker 加上 OAuth 流程**：需在 `workers/ts-agent` 實作授權碼換 token、Cookie 與 JWKS 驗證（可參考官方範本 [remote-mcp-cf-access](https://github.com/cloudflare/ai/tree/main/demos/remote-mcp-cf-access)）。
-4. **設定 Worker 的 Secrets**：`ACCESS_CLIENT_ID`、`ACCESS_CLIENT_SECRET`、`ACCESS_TOKEN_URL`、`ACCESS_AUTHORIZATION_URL`、`ACCESS_JWKS_URL`、`COOKIE_ENCRYPTION_KEY`（例如 `openssl rand -hex 32` 產生），並建立 Workers KV namespace 綁定 `OAUTH_KV` 供範例儲存 token。
+#### 設定步驟
 
-本專案目前為「未加 Access」的 MCP；若要改成需登入才能連線，需依上述文件與範本修改 `workers/ts-agent` 的程式與設定。
+1. **建立 Zero Trust 組織**：在 Cloudflare Dashboard 中進入 Zero Trust，並設定 One-time PIN 或第三方 IdP。
+2. **建立 Access for SaaS 應用**：
+   - 在 Zero Trust → Access → Applications 新增 SaaS 應用。
+   - 類型選擇 **OIDC**。
+   - 設定 Redirect URI 為 `https://mcp-ts-agent.<你的子網域>.workers.dev/callback`。
+   - 完成後，取得以下資訊：`client_id`、`client_secret`，以及 Token / Authorization / JWKS 的端點 URL。
+3. **建立 KV Namespace**：
+   - 執行 `npx wrangler kv:namespace create OAUTH_KV`
+   - 將產生的 `id` 填入 `workers/ts-agent/wrangler.toml` 中的 `[[kv_namespaces]]` 區塊。
+4. **設定 Worker 的 Secrets**：
+   - 在 `workers/ts-agent` 目錄下，使用 `npx wrangler secret put <變數名稱>` 依序設定以下變數：
+     - `ACCESS_CLIENT_ID`: 步驟 2 取得的 Client ID
+     - `ACCESS_CLIENT_SECRET`: 步驟 2 取得的 Client Secret
+     - `ACCESS_TOKEN_URL`: 例如 `https://<your-team>.cloudflareaccess.com/cdn-cgi/access/sso/oidc/<client_id>/token`
+     - `ACCESS_AUTHORIZATION_URL`: 例如 `https://<your-team>.cloudflareaccess.com/cdn-cgi/access/sso/oidc/<client_id>/authorization`
+     - `ACCESS_JWKS_URL`: 例如 `https://<your-team>.cloudflareaccess.com/cdn-cgi/access/certs`
+     - `COOKIE_ENCRYPTION_KEY`: 產生一組 32 bytes 的 Hex 字串（可使用 `openssl rand -hex 32` 產生）
+
+完成上述設定後，重新部署 TS MCP Worker。存取 MCP 端點時，若未帶有有效的 Cookie，將會回傳 `401 Unauthorized`。若要取得 Cookie，請先透過瀏覽器存取 OAuth 授權流程（例如自行實作登入按鈕重導向至 `ACCESS_AUTHORIZATION_URL`），登入成功後會跳轉回 `/callback` 並自動設定 Cookie。
