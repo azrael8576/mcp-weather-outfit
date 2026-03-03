@@ -1,8 +1,9 @@
 /// <reference path="../worker-configuration.d.ts" />
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createMcpHandler } from "agents/mcp";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { OUTFIT_GUIDELINES_TEXT } from "./outfit-guidelines.js";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 
 async function callPythonWorker(
   baseUrl: string,
@@ -241,6 +242,87 @@ function createServer(env: Env): McpServer {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    // OAuth Callback 處理邏輯
+    if (url.pathname === "/callback" || url.pathname === "/callback/") {
+      const code = url.searchParams.get("code");
+      if (!code) {
+        return new Response("Missing authorization code", { status: 400 });
+      }
+
+      try {
+        // 1. 向 Cloudflare Access 交換 Token
+        const tokenRes = await fetch(env.ACCESS_TOKEN_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            client_id: env.ACCESS_CLIENT_ID,
+            client_secret: env.ACCESS_CLIENT_SECRET,
+            grant_type: "authorization_code",
+            code,
+            redirect_uri: `${url.origin}/callback`,
+          }),
+        });
+
+        if (!tokenRes.ok) {
+          const errorText = await tokenRes.text();
+          return new Response(`Failed to exchange token: ${errorText}`, { status: 500 });
+        }
+
+        const tokenData = await tokenRes.json() as { id_token?: string; access_token?: string };
+        const tokenToStore = tokenData.id_token || tokenData.access_token;
+
+        if (!tokenToStore) {
+          return new Response("No token received from provider", { status: 500 });
+        }
+
+        // 2. 產生 Session ID 並儲存 Token 到 KV (設定 24 小時過期)
+        const sessionId = crypto.randomUUID();
+        await env.OAUTH_KV.put(`session:${sessionId}`, tokenToStore, { expirationTtl: 86400 });
+
+        // 3. 將 Session ID 加密後寫入 Cookie
+        // 將 hex string 轉為 Uint8Array
+        const keyHex = env.COOKIE_ENCRYPTION_KEY;
+        const keyBytes = new Uint8Array(keyHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+        const cryptoKey = await crypto.subtle.importKey(
+          "raw",
+          keyBytes,
+          { name: "AES-GCM" },
+          false,
+          ["encrypt"]
+        );
+
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encodedSessionId = new TextEncoder().encode(sessionId);
+        const ciphertext = await crypto.subtle.encrypt(
+          { name: "AES-GCM", iv },
+          cryptoKey,
+          encodedSessionId
+        );
+
+        const ivHex = Array.from(iv).map(b => b.toString(16).padStart(2, '0')).join('');
+        const cipherHex = Array.from(new Uint8Array(ciphertext)).map(b => b.toString(16).padStart(2, '0')).join('');
+        const encryptedCookieValue = `${ivHex}:${cipherHex}`;
+
+        // 4. 設定 Cookie 並重導向回首頁或 MCP 端點
+        const headers = new Headers();
+        headers.append(
+          "Set-Cookie",
+          `CF_Authorization=${encryptedCookieValue}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=86400`
+        );
+        headers.append("Location", "/");
+
+        return new Response("Login successful! You can now use the MCP.", {
+          status: 302,
+          headers,
+        });
+      } catch (error) {
+        return new Response(`Internal Server Error: ${error instanceof Error ? error.message : String(error)}`, { status: 500 });
+      }
+    }
+
     // 健康檢查端點：檢查 PYTHON_WORKER_URL 是否已設定（部署後 404 時可先 curl /health）
     if (url.pathname === "/health" || url.pathname === "/health/") {
       const configured = Boolean(env.PYTHON_WORKER_URL?.trim());
@@ -253,6 +335,62 @@ export default {
     if (url.pathname !== "/mcp" && url.pathname !== "/mcp/") {
       return new Response("Not Found", { status: 404 });
     }
+
+    // 驗證邏輯 (Middleware)
+    const cookieHeader = request.headers.get("Cookie") || "";
+    const match = cookieHeader.match(/CF_Authorization=([^;]+)/);
+    
+    if (!match) {
+      return new Response("Unauthorized: Missing Cookie", { status: 401 });
+    }
+
+    const encryptedCookieValue = match[1];
+    
+    try {
+      // 1. 解密 Cookie 取得 Session ID
+      const [ivHex, cipherHex] = encryptedCookieValue.split(":");
+      if (!ivHex || !cipherHex) throw new Error("Invalid cookie format");
+
+      const keyHex = env.COOKIE_ENCRYPTION_KEY;
+      const keyBytes = new Uint8Array(keyHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+      const cryptoKey = await crypto.subtle.importKey(
+        "raw",
+        keyBytes,
+        { name: "AES-GCM" },
+        false,
+        ["decrypt"]
+      );
+
+      const iv = new Uint8Array(ivHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+      const ciphertext = new Uint8Array(cipherHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+
+      const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv },
+        cryptoKey,
+        ciphertext
+      );
+      const sessionId = new TextDecoder().decode(decrypted);
+
+      // 2. 從 KV 取得 Token
+      const token = await env.OAUTH_KV.get(`session:${sessionId}`);
+      if (!token) {
+        return new Response("Unauthorized: Session expired or invalid", { status: 401 });
+      }
+
+      // 3. 驗證 JWT Token (使用 JWKS)
+      const jwksUrl = new URL(env.ACCESS_JWKS_URL);
+      const JWKS = createRemoteJWKSet(jwksUrl);
+      
+      // jwtVerify 會自動驗證過期時間等
+      await jwtVerify(token, JWKS, {
+        issuer: new URL(env.ACCESS_JWKS_URL).origin, // Cloudflare Access issuer is usually the team domain
+        audience: env.ACCESS_CLIENT_ID,
+      });
+
+    } catch (error) {
+      return new Response(`Unauthorized: ${error instanceof Error ? error.message : "Invalid token"}`, { status: 401 });
+    }
+
     const server = createServer(env);
     return createMcpHandler(server.server, { route: "/mcp" })(
       request,
