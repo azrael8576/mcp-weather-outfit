@@ -1,25 +1,63 @@
 /**
- * 穿搭指南 Resource 的靜態內容（供 LLM 讀取後依天氣給建議）
+ * Outfit guidelines resource content (for LLM to read and suggest based on weather)
  */
 export const OUTFIT_GUIDELINES_TEXT = `
-# 天氣穿搭指南 (Outfit Guidelines)
+# Weather Outfit Guidelines
 
-請依下列規則，根據使用者所在地的天氣（氣溫、降雨、風等）給予穿搭建議。
+These are evidence-based outfit suggestions. Please give friendly recommendations based on the user's local weather (feels-like temperature, wind, humidity, rain, sun, etc.). For reference only.
 
-## 氣溫
-- **30°C 以上**：短袖、短褲、涼鞋、帽子、防曬；多喝水。
-- **25–30°C**：短袖或薄長袖、薄長褲或短褲、透氣鞋。
-- **18–25°C**：薄長袖、長褲或七分褲；早晚可加薄外套。
-- **10–18°C**：長袖、長褲、薄外套或毛衣、輕便外套。
-- **0–10°C**：毛衣、大衣或羽絨外套、圍巾、手套、保暖鞋。
-- **0°C 以下**：厚大衣／羽絨、多層穿著、帽子手套圍巾、防寒鞋。
+## 1. Feels-Like Temperature as Reference
+Feels-like already factors in wind chill and heat index, so it better reflects how it actually feels. Prefer **feels-like temperature** when judging how much to wear.
 
-## 降雨與天氣
-- **下雨**：雨傘或雨衣、防水外套、防滑鞋；避免棉質易濕。
-- **多雲／陰天**：可帶輕便外套以防突然降雨或轉涼。
-- **強風**：防風外套、避免寬鬆易吹的衣物。
+- **Above 30°C (86°F)**: Warm; light, loose, light-colored breathable shorts/short sleeves; consider sun protection (hat, sunglasses).
+- **25–30°C (77–86°F)**: Hot; short or thin long sleeves, breathable fabrics.
+- **20–25°C (68–77°F)**: Comfortable; thin long sleeves and pants; a light layer for those who run cold.
+- **15–20°C (59–68°F)**: Cool; long sleeves, pants, light jacket or sweater.
+- **10–15°C (50–59°F)**: Chilly; consider a mid layer (sweater/fleece) and a wind-resistant outer layer.
+- **5–10°C (41–50°F)**: Cold; coat or down jacket, scarf, gloves tend to feel better.
+- **Below 5°C (41°F)**: Very cold; consider a heavy coat/down, hat, gloves, thick socks, and paying attention to hands and feet.
 
-## 通用建議
-- 洋蔥式穿著（多層可穿脫）以應對室內外溫差。
-- 依實際體感與活動量微調，以上僅供參考。
+## 2. Humidity
+Humidity affects heat transfer and sweat evaporation:
+- **Hot + humid (e.g. humidity > 70%)**: Sweat evaporates less; consider avoiding heavy cotton (stays wet on skin) and opting for moisture-wicking fabrics.
+- **Cold + humid**: Moisture draws heat from the body; a water-resistant outer layer can help avoid getting chilled when damp.
+
+## 3. Wind Speed & Gusts
+Wind disrupts the warm air layer around the body (reducing clothing insulation):
+- **Light wind (< 3 m/s)**: Little impact on what to wear.
+- **Moderate to strong wind (3–8 m/s)**: Feels cooler; consider denser fabrics or a light wind layer.
+- **Strong wind (> 8 m/s or gusty)**: Consider a windbreaker as the outer layer to trap warmth; loose, breezy clothes may feel less comfortable.
+
+## 4. Rain & Snow
+- **When rain or snow is possible)**: Consider a waterproof outer layer (e.g. rain jacket) and slip-resistant, water-resistant footwear.
+- **Rainy days)**: Cotton and denim dry slowly when wet; consider avoiding them in favor of quick-dry or water-resistant options.
+- **10–15°C (50–59°F)**: Chilly; consider a mid layer (sweater/fleece) and a wind-resistant outer layer.
+## 5. Three-Layer System
+For changeable weather or large temperature swings, the layering approach can help:
+1. **Base layer**: Moisture management next to skin (e.g. wicking or thermal, depending on temperature).
+2. **Mid layer**: Warmth and trapped air (e.g. fleece, wool, sweater).
+3. **Outer layer**：Wind and rain protection (windproof/waterproof jacket).
+Humidity affects heat transfer and sweat evaporation:
+## 6. Sun & Cloud Cover
+- **Daytime with low clouds (e.g. < 30%)**：UV can still be high; consider sun protection (sunglasses, sunscreen, hat).
+- **Around or after sunset**：Temperature often drops after the sun goes down; if staying out late, consider bringing an extra warm layer.
+## 3. Wind Speed & Gusts
+Wind disrupts the warm air layer around the body (reducing clothing insulation):
+- **Light wind (< 3 m/s)**: Little impact on what to wear.
+- **Moderate to strong wind (3–8 m/s)**: Feels cooler; consider denser fabrics or a light wind layer.
+- **Strong wind (> 8 m/s or gusty)**: Consider a windbreaker as the outer layer to trap warmth; loose, breezy clothes may feel less comfortable.
+
+## 4. Rain & Snow
+- **When rain or snow is possible)**: Consider a waterproof outer layer (e.g. rain jacket) and slip-resistant, water-resistant footwear.
+- **Rainy days)**: Cotton and denim dry slowly when wet; consider avoiding them in favor of quick-dry or water-resistant options.
+
+## 5. Three-Layer System
+For changeable weather or large temperature swings, the layering approach can help:
+1. **Base layer**: Moisture management next to skin (e.g. wicking or thermal, depending on temperature).
+2. **Mid layer**: Warmth and trapped air (e.g. fleece, wool, sweater).
+3. **Outer layer**: Wind and rain protection (windproof/waterproof jacket).
+
+## 6. Sun & Cloud Cover
+- **Daytime with low clouds (e.g. < 30%)**: UV can still be high; consider sun protection (sunglasses, sunscreen, hat).
+- **Around or after sunset)**: Temperature often drops after the sun goes down; if staying out late, consider bringing an extra warm layer.
 `.trim();
