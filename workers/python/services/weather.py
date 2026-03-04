@@ -1,8 +1,8 @@
 import json
 from typing import Dict, Any
 from workers import fetch
-from ..config import OPENWEATHER_BASE
-from ..core.exceptions import RateLimitError, AuthError, UpstreamError, ServiceError
+from config import OPENWEATHER_BASE
+from core.exceptions import RateLimitError, AuthError, UpstreamError, ServiceError
 
 class OpenWeatherMapService:
     def __init__(self, api_key: str):

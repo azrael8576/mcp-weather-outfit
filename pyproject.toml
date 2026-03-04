@@ -21,5 +21,6 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = ["workers/python"]
+# Use project root so workers.python.* resolves consistently (no duplicate top-level "core"/"services").
 testpaths = ["workers/python/tests"]
 asyncio_mode = "auto"

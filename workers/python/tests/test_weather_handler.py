@@ -1,7 +1,7 @@
 import pytest
-from ..handlers import handle_weather
-from ..services.fakes import FakeWeatherService
-from ..core.exceptions import RateLimitError, AuthError, UpstreamError
+from handlers import handle_weather
+from services.fakes import FakeWeatherService
+from core.exceptions import RateLimitError, AuthError, UpstreamError
 
 @pytest.fixture
 def weather_service():

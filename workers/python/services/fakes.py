@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Optional
-from ..core.exceptions import RateLimitError, AuthError, UpstreamError
+from core.exceptions import RateLimitError, AuthError, UpstreamError
 
 class FakeWeatherService:
     def __init__(self):
