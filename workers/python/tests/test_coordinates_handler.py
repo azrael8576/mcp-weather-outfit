@@ -1,7 +1,7 @@
 import pytest
-from ..handlers import handle_coordinates
-from ..services.fakes import FakeCitiesService
-from ..core.exceptions import ServiceError
+from handlers import handle_coordinates
+from services.fakes import FakeCitiesService
+from core.exceptions import ServiceError
 
 @pytest.fixture
 def cities_service():

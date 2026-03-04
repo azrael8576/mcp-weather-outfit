@@ -1,11 +1,19 @@
 # MCP 天氣 API：D1 城市經緯度查詢 + OpenWeatherMap 天氣
+# Bootstrap so Cloudflare Workers can resolve local imports (no parent package at runtime).
+import sys
+from pathlib import Path
+
+_here = Path(__file__).resolve().parent
+if str(_here) not in sys.path:
+    sys.path.insert(0, str(_here))
+
 from urllib.parse import urlparse, parse_qs
 
 from workers import WorkerEntrypoint, Response
 
-from .handlers import handle_coordinates, handle_weather
-from .services.cities import CloudflareD1CitiesService
-from .services.weather import OpenWeatherMapService
+from handlers import handle_coordinates, handle_weather
+from services.cities import CloudflareD1CitiesService
+from services.weather import OpenWeatherMapService
 
 
 class Default(WorkerEntrypoint):

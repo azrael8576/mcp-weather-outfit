@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Optional
-from ..core.exceptions import ServiceError
+from core.exceptions import ServiceError
 
 class CloudflareD1CitiesService:
     def __init__(self, db: Any):

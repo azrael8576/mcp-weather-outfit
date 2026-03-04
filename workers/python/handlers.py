@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from workers import Response
-from .services.ports import CitiesService, WeatherService
-from .core.exceptions import RateLimitError, AuthError, UpstreamError, ServiceError
+from services.ports import CitiesService, WeatherService
+from core.exceptions import RateLimitError, AuthError, UpstreamError, ServiceError
 
 async def handle_coordinates(query: Dict[str, Any], cities_service: CitiesService) -> Response:
     city = (query.get("city") or [None])[0]
