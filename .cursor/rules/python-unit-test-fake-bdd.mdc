@@ -1,0 +1,47 @@
+---
+description: Python 單元測試：Fake Test double、測試掛鉤與 BDD 命名（given/when/then）
+globs: workers/python/tests/**/*.py
+alwaysApply: false
+---
+
+# Python 單元測試：Fake 與 BDD
+
+本專案 Python Worker 的單元測試使用 **Test Double** 中的 **Fake**：與正式版實作共用相同介面，但 Fake 實作較簡單、可預測，並提供**測試掛鉤**供驗證。
+
+## Test double：Fake
+
+- **介面一致**：Fake 實作與正式版（如 `OpenWeatherMapService`、`CloudflareD1CitiesService`）實作同一組介面（見 `services/ports.py`）。
+- **Fake 位置**：`workers/python/services/fakes.py`（`FakeWeatherService`、`FakeCitiesService`）。
+- **測試掛鉤**：Fake 物件提供可讓測試設定的方法與屬性，用來驗證行為與回傳值：
+  - 例如 `set_weather(lat, lon, response)`、`set_error(error)`、`add_city(city_data)` 等設定預期結果或錯誤；
+  - 例如 `calls` 列表記錄每次呼叫的參數，供 assert 驗證「是否以正確參數呼叫」。
+
+撰寫或擴充單元測試時，應透過這些掛鉤設定前提，並在 then 區塊中對回傳值或 `calls` 做斷言。
+
+## 測試命名：BDD 風格
+
+測試函式命名遵循 **BDD** 格式：
+
+**`given <前提> when <行為> then <單一結果>`**
+
+- **given**：最小且業務可識別的前提（例如「沒有提供 city 參數」「API 達到呼叫上限」），不含實作細節。
+- **when**：可觀察的互動或事件（例如「查詢座標」「請求天氣」）。
+- **then**：**單一**可驗證的結果（例如「回傳 400 錯誤」「回傳天氣資料」）。
+
+### 範例
+
+```python
+@pytest.mark.asyncio
+async def test_given_沒有提供經緯度_when_請求天氣_then_回傳400錯誤(weather_service):
+    # given
+    query = {}
+
+    # when
+    response = await handle_weather(query, weather_service)
+
+    # then
+    assert response.status == 400
+    assert "Missing 'lat' or 'lon'" in response.body["error"]
+```
+
+新增或修改 `workers/python/tests/` 底下的測試時，請依上述 Fake 掛鉤與 BDD 命名撰寫。
