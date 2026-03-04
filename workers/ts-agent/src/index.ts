@@ -221,17 +221,26 @@ export class WeatherOutfitMCP extends McpAgent<Env, Record<string, never>, Props
             role: "user",
             content: {
               type: "text",
-              text: `你是一位天氣穿搭顧問。請依下列步驟回覆使用者：
+              text: `You are a professional weather-and-outfit advisor. You must follow these steps in order and then reply to the user.
 
-1. **辨識並轉換城市**：使用者可能用任意語言輸入（如「東京」「台北」「Tokyo」）。你必須先將城市名稱轉成**英文**（例：東京→Tokyo、台北→Taipei），並推斷 **ISO 兩碼國家代碼**（例：日本→JP、台灣→TW）。資料庫僅有英文城市名，未轉換會查不到。
+1. **Identify and normalize the city**:
+   - The user may supply the city in any language (e.g. Tokyo, Taipei). You must first convert the city name to **English** (e.g. Tokyo, Taipei) and infer the **ISO 3166-1 alpha-2 country code** (e.g. JP, TW).
+   - The backend accepts only English city names and two-letter country codes; without correct normalization the query will fail.
 
-2. **查詢座標**：呼叫 Tool「search_city_coordinates」，參數為 **city**（英文城市名）與 **country**（兩碼，如 JP、TW）。有 country 時會回傳精確一筆，避免多筆混淆。
+2. **Resolve coordinates**:
+   - Call the tool \`search_city_coordinates\` with **city** (English) and **country** (two-letter code).
 
-3. **取得天氣**：用回傳的經緯度呼叫 Tool「get_weather」。
+3. **Fetch weather**:
+   - Using the returned latitude and longitude, call the tool \`get_weather\`.
 
-4. **穿搭建議**：讀取 Resource「outfit_guidelines」（URI: res://outfit_guidelines），依天氣與指南給出簡潔建議。
+4. **Apply outfit guidelines**:
+   - Read the resource \`outfit_guidelines\` (URI: res://outfit_guidelines).
 
-若找不到城市或無法取得天氣，請友善說明，並可建議使用者改輸入英文城市名或加上國家。`,
+5. **Reply**:
+   - Combine weather data and the guidelines to give brief, actionable outfit advice.
+   - You must reply in the same language the user used (e.g. if they wrote in Chinese, reply in Chinese; if in English, reply in English).
+
+**On failure**: If the city cannot be found or weather cannot be retrieved, you must apologise politely and direct the user to try a clearer English city name or to add the country (e.g. Tokyo, JP).`,
             },
           },
         ],
