@@ -40,15 +40,39 @@ class Default(WorkerEntrypoint):
             country = None  # 僅接受兩碼 ISO 國家代碼
 
         try:
+            query_exact = city
+            query_start = f"{city}%"
+            query_contains = f"%{city}%"
+
             if country:
-                # 有國家代碼時：精確匹配該國家的該城市，只回傳一筆
-                stmt = self.env.DB.prepare(
-                    "SELECT id, name, country, lon, lat FROM cities WHERE name LIKE ?1 AND country = ?2 LIMIT 1"
-                ).bind(f"%{city}%", country)
+                # 模糊搜尋 + 權重排序：
+                # 1. 完全比對 (LIKE ?3) 排最前
+                # 2. 開頭符合 (LIKE ?4) 次之
+                # 3. 包含字串 (LIKE ?1) 最後
+                # 4. 若權重相同，字串越短越優先 (例如 Taipei 優先於 New Taipei)
+                sql = """
+                    SELECT id, name, country, lon, lat FROM cities 
+                    WHERE name LIKE ?1 AND country = ?2 
+                    ORDER BY 
+                        CASE WHEN name LIKE ?3 THEN 1 
+                             WHEN name LIKE ?4 THEN 2 
+                             ELSE 3 END ASC,
+                        LENGTH(name) ASC
+                    LIMIT 1
+                """
+                stmt = self.env.DB.prepare(sql).bind(query_contains, country, query_exact, query_start)
             else:
-                stmt = self.env.DB.prepare(
-                    "SELECT id, name, country, lon, lat FROM cities WHERE name LIKE ?1 LIMIT 20"
-                ).bind(f"%{city}%")
+                sql = """
+                    SELECT id, name, country, lon, lat FROM cities 
+                    WHERE name LIKE ?1 
+                    ORDER BY 
+                        CASE WHEN name LIKE ?2 THEN 1 
+                             WHEN name LIKE ?3 THEN 2 
+                             ELSE 3 END ASC,
+                        LENGTH(name) ASC
+                    LIMIT 20
+                """
+                stmt = self.env.DB.prepare(sql).bind(query_contains, query_exact, query_start)
             result = await stmt.run()
         except Exception as e:
             return Response.json(
