@@ -9,6 +9,24 @@
 
 本專案的目標是展示如何使用 Cloudflare 的 Serverless 生態系統建立穩定且高效的 Model Context Protocol (MCP) 伺服器，提供完整的整合方案給予開發者參考。
 
+## MCP Tools & Resources
+
+本 MCP 伺服器提供以下核心功能供 LLM 或客戶端呼叫使用：
+
+### Tools
+- **`search_city_coordinates`**：查詢城市經緯度。
+  - **Use Case**: 當使用者詢問特定城市天氣（例如「東京的天氣」），LLM 可使用此 Tool 將城市轉為英文 (`Tokyo`) 及國家代碼 (`JP`) 進行查詢，取得精確的 `lat` 與 `lon`。
+- **`get_weather`**：依經緯度取得該地即時天氣。
+  - **Use Case**: 取得經緯度後，LLM 呼叫此 Tool 以獲取包含溫度、體感、濕度、風速等完整的即時天氣資訊。
+
+### Resources
+- **`outfit_guidelines`** (URI: `res://outfit_guidelines`)：靜態穿搭指南。
+  - **Use Case**: 提供不同氣溫區間的穿搭建議標準，讓 LLM 在回覆天氣資訊時，能結合此指南給予專業的穿搭建議。
+
+### Prompts
+- **`weather_outfit_advisor`**：天氣穿搭顧問 Prompt。
+  - **Use Case**: 預先設定好的系統提示詞，引導 LLM 依照「辨識轉換城市 -> 查詢座標 -> 取得天氣 -> 讀取指南並給予建議」的標準流程進行回覆。
+
 ## Tech stack
 
 - **Architecture**: Model Context Protocol (MCP)
@@ -97,6 +115,9 @@ npx wrangler deploy
 在 `workers/ts-agent` 目錄下執行 TS Agent 的部署：
 
 ```bash
+# 進入目錄
+cd workers/ts-agent
+
 # 設定 Python Worker 的對外 URL
 npx wrangler secret put PYTHON_WORKER_URL
 
