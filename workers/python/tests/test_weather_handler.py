@@ -84,3 +84,17 @@ async def test_given_上游天氣API回傳錯誤_when_請求天氣_then_回傳50
     # then
     assert response.status == 502
     assert "API returned status 500" in response.body["error"]
+
+@pytest.mark.asyncio
+async def test_given_發生非預期的例外_when_請求天氣_then_回傳500錯誤(weather_service):
+    # given
+    weather_service.set_error(Exception("Unexpected database or memory error"))
+    query = {"lat": ["25.0"], "lon": ["121.5"]}
+    
+    # when
+    response = await handle_weather(query, weather_service)
+    
+    # then
+    assert response.status == 500
+    assert "Internal server error" in response.body["error"]
+    assert "Unexpected database or memory error" in response.body["detail"]
