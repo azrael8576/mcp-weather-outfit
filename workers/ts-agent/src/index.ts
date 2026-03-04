@@ -2,8 +2,8 @@ import OAuthProvider from "@cloudflare/workers-oauth-provider";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { McpAgent } from "agents/mcp";
 import { z } from "zod";
-import { OUTFIT_GUIDELINES_TEXT } from "./outfit-guidelines.js";
 import { handleAccessRequest } from "./access-handler";
+import { OUTFIT_GUIDELINES_TEXT } from "./outfit-guidelines.js";
 import type { Props } from "./workers-oauth-utils";
 
 async function callPythonWorker(

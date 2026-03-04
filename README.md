@@ -89,11 +89,14 @@ graph TD
 
 ## Build Testing
 
-請開啟多個終端機進行測試流程：
+### Unit tests (Python Worker)
 
-1. **Python Worker** ：在專案根目錄執行 `npx wrangler dev` （確認埠號，例如 8788 ）。
-2. **TS MCP 伺服器**：在 `workers/ts-agent` 執行 `npm run dev` （確認埠號，例如 8787 ）。
-3. **MCP Inspector** ：執行 `npx @modelcontextprotocol/inspector@latest` ，於瀏覽器中輸入 `http://localhost:8787/mcp` 進行連線與測試。
+Python Worker 的單元測試採用 pytest，使用 Fake 依賴注入，無需 D1 或 OpenWeatherMap API 即可執行：
+
+```bash
+uv sync --extra dev
+uv run pytest
+```
 
 ## Deployment Python Worker
 
