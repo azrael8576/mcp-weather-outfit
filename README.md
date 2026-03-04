@@ -4,6 +4,7 @@
 [![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-F38020?style=flat-square&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 [![Model Context Protocol](https://img.shields.io/badge/MCP-Protocol-blue?style=flat-square)](https://modelcontextprotocol.io/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/azrael8576/mcp-weather-outfit/blob/main/LICENSE)
 
 「 MCP Weather Outfit 」是一款基於 Cloudflare Workers 與 D1 構建的 MCP 伺服器，提供即時天氣查詢與穿搭建議功能（包含 Tools 、 Resources 以及 Prompts ）。
 
@@ -138,4 +139,6 @@ npm run deploy
 
 ## License
 
-本專案採用的授權條款請參考 [LICENSE](LICENSE) 檔案。
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/azrael8576/mcp-weather-outfit/blob/main/LICENSE)
+
+**MCP Weather Outfit** is distributed under the terms of the Apache License (Version 2.0). See the [license](https://github.com/azrael8576/mcp-weather-outfit/blob/main/LICENSE) for more information.
