@@ -135,7 +135,16 @@ npm run deploy
 
 本專案的 TS MCP 伺服器已實作 Cloudflare Access (SSO / OIDC) 保護，確保只有經過驗證的使用者能存取 MCP 端點。
 
-設定步驟包含建立 Zero Trust 組織、配置 Access for SaaS 應用、建立 KV Namespace ( `OAUTH_KV` )，以及在 Worker 中設定對應的 Secrets (如 `ACCESS_CLIENT_ID` , `COOKIE_ENCRYPTION_KEY` 等)。存取時若未帶有有效 Cookie ，系統將回傳 401 Unauthorized 。
+設定步驟包含建立 Zero Trust 組織、配置 Access for SaaS 應用、建立 KV Namespace ( `OAUTH_KV` )，以及在 Worker 中設定以下 Secrets：
+
+| Secret | 說明 |
+|--------|------|
+| `ACCESS_CLIENT_ID` | Cloudflare Access OAuth 應用程式的 Client ID |
+| `ACCESS_CLIENT_SECRET` | Cloudflare Access OAuth 應用程式的 Client Secret |
+| `ACCESS_TOKEN_URL` | Cloudflare Access Token 端點 URL |
+| `ACCESS_AUTHORIZATION_URL` | Cloudflare Access Authorization 端點 URL |
+| `ACCESS_JWKS_URL` | Cloudflare Access JWKS 公鑰端點 URL |
+| `COOKIE_ENCRYPTION_KEY` | 用於加密已授權客戶端 Cookie 的金鑰 |
 
 ## License
 

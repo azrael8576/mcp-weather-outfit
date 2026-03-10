@@ -90,15 +90,20 @@ echo "PYTHON_WORKER_URL=http://localhost:8788" > workers/ts-agent/.dev.vars
 
 **D1 city search** (`services/cities.py`) uses a three-tier SQL strategy: exact match → prefix match → LIKE fuzzy match.
 
-**Authentication**: TS Agent uses Cloudflare Access (OIDC JWT validation) via `access-handler.ts`. The `CLOUDFLARE_AUD` environment variable must be set in production.
+**Authentication**: TS Agent uses Cloudflare Access (OIDC/JWT) via `access-handler.ts`. The OAuth flow requires `ACCESS_CLIENT_ID`, `ACCESS_CLIENT_SECRET`, `ACCESS_TOKEN_URL`, `ACCESS_AUTHORIZATION_URL`, `ACCESS_JWKS_URL`, and `COOKIE_ENCRYPTION_KEY` to be set as Wrangler secrets in production.
 
 ## Environment Variables
 
 | Location | Variable | Purpose |
 |----------|----------|---------|
 | Root `.dev.vars` / Wrangler secret | `OPEN_WEATHER_KEY` | OpenWeatherMap API key |
-| `workers/ts-agent/.dev.vars` / Wrangler secret | `PYTHON_WORKER_URL` | Python Worker URL |
-| `workers/ts-agent/.dev.vars` (optional) | `CLOUDFLARE_AUD` | Cloudflare Access audience tag |
+| `workers/ts-agent` Wrangler secret | `PYTHON_WORKER_URL` | Python Worker URL |
+| `workers/ts-agent` Wrangler secret | `ACCESS_CLIENT_ID` | Cloudflare Access OAuth client ID |
+| `workers/ts-agent` Wrangler secret | `ACCESS_CLIENT_SECRET` | Cloudflare Access OAuth client secret |
+| `workers/ts-agent` Wrangler secret | `ACCESS_TOKEN_URL` | Cloudflare Access token endpoint URL |
+| `workers/ts-agent` Wrangler secret | `ACCESS_AUTHORIZATION_URL` | Cloudflare Access authorization endpoint URL |
+| `workers/ts-agent` Wrangler secret | `ACCESS_JWKS_URL` | Cloudflare Access JWKS endpoint URL |
+| `workers/ts-agent` Wrangler secret | `COOKIE_ENCRYPTION_KEY` | Key for encrypting approval cookies |
 
 ## Important Files
 
